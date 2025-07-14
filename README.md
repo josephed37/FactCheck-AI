@@ -1,4 +1,4 @@
-# Veritas-AI: Real-Time Fact-Checker
+# FactCheck-AI: Real-Time Fact-Checker
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
