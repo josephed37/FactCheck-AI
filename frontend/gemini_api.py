@@ -84,7 +84,7 @@ def get_fact_check(statement: str) -> FactCheckResponse | None:
     """
 
     try:
-        prompt_path = Path(__file__).parent.parent / "prompts" / "fact_check_prompt.txt"
+        prompt_path = Path(__file__).parent.parent / "backend" / "prompts" / "fact_check_prompt.txt"
 
         with open(prompt_path, 'r') as f:
             prompt_template = f.read()
