@@ -15,7 +15,6 @@ load_dotenv()
 # Get a logger instance for this module
 logger = logging.getLogger(__name__) 
 
-# --- Configuration ---
 
 # Load API key from .env file.
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
