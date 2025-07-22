@@ -1,0 +1,38 @@
+# This specifies the version of the Docker Compose file format.
+# Version 3.8 is a modern and stable choice.
+version: '3.8'
+
+# The 'services' block is where we define each container of our application.
+# We will have two services: 'backend' and 'frontend'.
+services:
+  # --- The Go Backend Service ---
+  backend:
+    # 'build' tells Docker Compose where to find the Dockerfile for this service.
+    # The context is the 'backend' directory.
+    build: ./backend
+    # 'container_name' gives our container a predictable name.
+    container_name: factcheck-backend
+    # 'ports' maps a port from the host machine to a port inside the container.
+    # Format is "HOST:CONTAINER". We're mapping our computer's port 8080
+    # to the container's port 8080 (where our Go app is listening).
+    ports:
+      - "8080:8080"
+    # 'environment' is how we securely pass environment variables, like our
+    # API key, into the container. It reads from our local .env file.
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+  # --- The Streamlit Frontend Service ---
+  frontend:
+    # The build context for the frontend is the 'frontend' directory.
+    build: ./frontend
+    container_name: factcheck-frontend
+    # We map our computer's port 8501 to the container's port 8501,
+    # which is the default port for Streamlit.
+    ports:
+      - "8501:8501"
+    # 'depends_on' tells Docker Compose that the frontend service should not
+    # start until the backend service is up and running. This prevents errors.
+    depends_on:
+      - backend
+
