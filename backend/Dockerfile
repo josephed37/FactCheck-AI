@@ -1,10 +1,11 @@
 # --- Stage 1: The Builder ---
+# We start with our Alpine-based Go image.
 FROM golang:tip-alpine3.21 AS builder
 
-# Ensure the ca-certificates package is installed in the builder.
-# This gives us the root certificates we need to copy later. This command
-# works on any Alpine-based image.
-RUN apk add --no-cache ca-certificates
+# NEW: Install the C compiler and build tools (gcc, make, etc.).
+# The 'build-base' package on Alpine contains all the necessary tools for CGO.
+# We also still need the ca-certificates for HTTPS calls.
+RUN apk add --no-cache build-base ca-certificates
 
 # Set the working directory inside the container.
 WORKDIR /app
@@ -17,19 +18,21 @@ RUN go mod download
 COPY . .
 
 # Build the Go application.
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /bin/server ./cmd/api/main.go
+# REMOVED: We have removed 'CGO_ENABLED=0' to allow our program to use
+# the go-sqlite3 C bindings.
+RUN go build -ldflags="-w -s" -o /bin/server ./cmd/api/main.go
 
 
 # --- Stage 2: The Final Image ---
-# We use 'alpine' as our base. It's a tiny, secure Linux
-# distribution that provides a minimal environment, including networking tools.
+# We continue to use 'alpine' as our base. This is now CRITICAL because
+# our compiled program is no longer fully static. It needs the standard
+# C libraries (like musl libc) that Alpine provides to run correctly.
 FROM alpine:latest
 
 # Set the working directory.
 WORKDIR /app
 
-# THE FIX: Copy the trusted CA certificates from our 'builder' stage.
-# This gives our application the "phonebook" it needs to verify HTTPS connections.
+# Copy the trusted CA certificates from our 'builder' stage.
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Copy only the compiled binary from the 'builder' stage.

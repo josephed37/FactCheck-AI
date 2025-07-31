@@ -14,3 +14,15 @@ type GeminiResponse struct {
 	Reason            string `json:"reason"`
 	AdditionalContext string `json:"additional_context"`
 }
+
+// retrieved from our database's history. It includes fields that the
+// database generates, like ID and CreatedAt.
+type FactCheckHistoryItem struct {
+	ID                int    `json:"id"`
+	Statement         string `json:"statement"`
+	Verdict           string `json:"verdict"`
+	Confidence        string `json:"confidence"`
+	Reason            string `json:"reason"`
+	AdditionalContext string `json:"additional_context"`
+	CreatedAt         string `json:"created_at"`
+}
