@@ -4,7 +4,7 @@ FactCheck-AI is a full-stack, real-time fact-checking application designed to co
 
 ## 📸 Application Preview
 
-![App Screenshot](./images/image%202.png.png)
+![App Screenshot](./images/image%202.png)
 
 ## ✨ Core Features
 
@@ -53,7 +53,7 @@ When a user submits a statement, the application follows a three-step process:
 **1. Clone the repository:**
 
 ```bash
-git clone [https://github.com/josephed37/FactCheck-AI.git](https://github.com/josephed37/FactCheck-AI.git)
+git clone https://github.com/josephed37/FactCheck-AI.git
 cd FactCheck-AI
 ```
 
