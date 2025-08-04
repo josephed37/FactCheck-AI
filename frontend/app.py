@@ -1,7 +1,5 @@
 import streamlit as st
-# We still need FactCheckResponse for type hinting
-from gemini_api import FactCheckResponse 
-# UPDATED: Import the new function that calls our backend
+from models import FactCheckResponse # Import from our models file
 from api_client import get_fact_check_from_backend
 from logger_config import setup_logging
 
@@ -19,13 +17,13 @@ st.set_page_config(
 st.title("🔎 Real-Time AI Fact-Checker")
 st.write(
     "Enter a statement to check for its factual accuracy. "
-    "This app is powered by a Go backend for speed and scalability."
+    "This app uses a RAG pipeline with live search results for up-to-date analysis."
 )
 
 statement = st.text_area(
     "Enter the statement to fact-check:",
     height=100,
-    placeholder="e.g., The Eiffel Tower is in London.",
+    placeholder="e.g., Who won the last FIFA World Cup?",
 )
 
 analyze_button = st.button("Analyze Statement", type="primary")
@@ -36,12 +34,9 @@ if analyze_button:
     if not statement.strip():
         st.warning("Please enter a statement to analyze.")
     else:
-        with st.spinner("Contacting the Go backend... The AI is thinking 🤔"):
-            # UPDATED: Call the new function that talks to our Go backend
+        with st.spinner("Performing live web search and AI analysis... 👨‍💻"):
             result: FactCheckResponse | None = get_fact_check_from_backend(statement)
 
-        # The rest of the result display logic is IDENTICAL, because
-        # our new function returns the same data structure.
         st.divider()
         if result:
             st.subheader("Analysis Complete")
@@ -60,6 +55,14 @@ if analyze_button:
                 st.info(f"**Reasoning:**\n\n{result.reason}")
             
             st.info(f"**Additional Context:**\n\n{result.additional_context}")
+
+            # --- NEW: Display the sources ---
+            # Check if the sources list is not empty.
+            if result.sources:
+                st.subheader("Sources Used for Analysis")
+                # Loop through each source and display it as a clickable link.
+                for source in result.sources:
+                    st.markdown(f"- [{source.title}]({source.url})")
 
         else:
             st.error(

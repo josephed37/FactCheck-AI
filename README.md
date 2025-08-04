@@ -1,133 +1,73 @@
-# FactCheck-AI: Real-Time Fact-Checker
+# FactCheck-AI: Real-Time RAG Fact-Checker
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Go Version](https://img.shields.io/badge/go-1.22-blue.svg)
-![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
-
-A high-performance fake news detector using Google's Gemini AI, served via a Go backend and consumed by a Streamlit web interface. This project is designed to provide rapid, real-time analysis of statements to combat the spread of misinformation.
-
----
+FactCheck-AI is a full-stack, real-time fact-checking application designed to combat misinformation. It leverages a sophisticated **Retrieval-Augmented Generation (RAG)** pipeline, using live web search results to provide Google's Gemini AI with up-to-the-minute context for accurate, trustworthy analysis.
 
 ## 📸 Application Preview
 
-![App Screenshot](./images/image%201.png)
-
----
+![App Screenshot](./images/image%202.png.png)
 
 ## ✨ Core Features
 
-- **AI-Powered Analysis**: Leverages the reasoning capabilities of Google's Gemini models to evaluate statements.
-- **Structured Output**: Returns a clear verdict (`True`, `False`, `Uncertain`), a confidence level, and detailed reasoning.
-- **Contextual Insights**: Provides additional context to help users understand the nuances of a claim.
-- **Scalable Architecture**: Built with a high-performance Go backend to handle concurrent users efficiently.
-- **Interactive Web UI**: A clean and simple user interface built with Streamlit for ease of use.
+* **Real-Time Analysis**: Solves the "knowledge cut-off" problem by using the Tavily Search API to fetch live information from the web for every query.
+* **RAG Pipeline**: Augments prompts to the Gemini AI with real-time context, ensuring analysis is based on the latest information.
+* **Transparent Sourcing**: Displays the web sources used for each fact-check, allowing users to verify the information themselves.
+* **Scalable Go Backend**: A high-performance backend written in Go handles concurrent requests efficiently.
+* **Interactive Web UI**: A clean and simple user interface built with Streamlit.
+* **Persistent History**: Saves all fact-checks to a SQLite database and displays them on a dedicated history page.
+* **Containerized**: The entire full-stack application is orchestrated with Docker and Docker Compose for easy setup and deployment.
 
----
+## ⚙️ How It Works: The RAG Pipeline
+
+When a user submits a statement, the application follows a three-step process:
+
+1. **Retrieve**: The Go backend sends the user's statement as a query to the **Tavily Search API**.
+2. **Augment**: The backend takes the top search results and constructs a new, "augmented" prompt. This prompt includes both the live search context and the user's original statement.
+3. **Generate**: This augmented prompt is sent to the **Google Gemini API**. The AI then generates its fact-check analysis based primarily on the fresh, real-time context provided, not its own internal (and potentially outdated) knowledge.
 
 ## 🛠️ Technology Stack
 
-This project uses a modern, decoupled architecture to ensure performance and scalability.
+* **Frontend**: Streamlit, Python
+* **Backend**: Go, Gin Web Framework
+* **AI & Search**: Google Gemini API, Tavily Search API
+* **Database**: SQLite
+* **Containerization**: Docker, Docker Compose
 
-**Frontend (Phase 1):**
+## 🚀 Project Status: Complete
 
-- **Framework**: [Streamlit](https://streamlit.io/)
-- **Language**: Python 3.11+
-- **API Client**: `google-generativeai`
-- **Data Validation**: `pydantic`
-- **Resilience**: `tenacity` for API retries
-
-**Backend (Phase 2):**
-
-- **Language**: Go 1.22+
-- **HTTP Server**: Gin or Fiber
-- **Logging**: `logrus` or `zerolog`
-- **Security**: Rate-limiting and secure API key management
-
-**Deployment (Phase 3):**
-
-- **Containerization**: Docker & Docker Compose
-- **Hosting**: GCP Cloud Run / Vercel (Optional)
-
----
-
-## 🧪 Testing & Automation
-
-To ensure code quality and reliability, this project utilizes:
-
-- **Frontend Testing**: `pytest` for unit tests on the Python-based Streamlit application.
-- **Backend Testing**: Go's built-in `testing` package for unit tests on the API service.
-- **CI/CD**: GitHub Actions to automatically run tests on every push and pull request to the `main` branch.
-
----
-
-## 🚀 Project Roadmap
-
-This project is being developed in three distinct phases:
-
-- [x] **Phase 1: Prototype & Core Inference**
-  - Build a working Streamlit prototype.
-  - Connect directly to the Gemini API.
-  - Implement data validation, logging, and error handling.
-
-- [ ] **Phase 2: Golang-Based Model Serving**
-  - Develop a high-performance Go API to act as middleware.
-  - Offload all Gemini API interaction to the Go service.
-  - Containerize the Go backend with Docker.
-
-- [ ] **Phase 3: Full Integration & Advanced Features**
-  - Connect the Streamlit frontend to the Go backend.
-  - Integrate a database (SQLite/Firestore) for query history.
-  - **Implement Retrieval-Augmented Generation (RAG)** by integrating a live search API to provide the model with real-time information.
-
----
+* [x] **Phase 1: Prototype & Core Inference**
+* [x] **Phase 2: Golang-Based Model Serving**
+* [x] **Phase 3: Full Integration, Database & RAG Pipeline**
 
 ## ⚙️ Setup and Installation
 
-To run this project locally, follow these steps.
-
 **Prerequisites:**
 
-- Python 3.11+
-- Go 1.22+ (for Phase 2)
-- An active Google AI Studio API key.
-- Docker (optional for Phase 3)
+* Docker and Docker Compose
+* A `.env` file in the project root with your API keys:
+
+    ```
+    GEMINI_API_KEY="YOUR_GEMINI_KEY"
+    TAVILY_API_KEY="YOUR_TAVILY_KEY"
+    ```
 
 **1. Clone the repository:**
 
 ```bash
-git clone https://github.com/josephed37/FactCheck-AI.git
+git clone [https://github.com/josephed37/FactCheck-AI.git](https://github.com/josephed37/FactCheck-AI.git)
 cd FactCheck-AI
 ```
 
-**2. Set up the Python environment (Phase 1):**
+**2. Run the application:**
+The entire application stack can be launched with a single command:
 
 ```bash
-# Create and activate a virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install required packages
-pip install -r requirements.txt
+docker compose up --build
 ```
 
-**3. Configure your API Key:**
+* The Streamlit frontend will be available at `http://localhost:8501`.
+* The Go backend API will be available at `http://localhost:8080`.
 
-- Create a file named `.env` in the root of the project.
-- Add your Gemini API key to it:
-
-    ```
-    GEMINI_API_KEY="YOUR_API_KEY_HERE"
-    ```
-
----
-
-## ▶️ How to Run
-
-To launch the Streamlit web application (Phase 1):
+To stop the application, press `Ctrl+C` in the terminal where it's running, and then run:
 
 ```bash
-streamlit run frontend/app.py
-```
-
-Navigate to `http://localhost:8501` in your web browser to use the application.
+docker compose down
